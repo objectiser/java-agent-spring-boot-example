@@ -1,0 +1,14 @@
+# This gets merged into the main openshift.yml's deployment config via f8 plugin
+spec:
+  template:
+    spec:
+      containers:
+        - env:
+          - name: JAVA_OPTIONS
+            value: "-javaagent:hawkular-apm-agent-opentracing-0.14.1.Final.jar=boot:hawkular-apm-agent-opentracing-0.14.1.Final.jar"
+          - name: HAWKULAR_APM_URI
+            value: "http://hawkular-apm-apm.172.31.7.9.xip.io"
+          - name: HAWKULAR_APM_USERNAME
+            value: "admin"
+          - name: HAWKULAR_APM_PASSWORD
+            value: "password"

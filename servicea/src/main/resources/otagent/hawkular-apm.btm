@@ -1,0 +1,10 @@
+RULE Hawkular APM Ignore server communications
+CLASS java.net.URL
+METHOD openConnection
+HELPER io.opentracing.contrib.agent.OpenTracingHelper
+AT EXIT
+IF $0.getPath().startsWith("/hawkular/apm")
+DO
+  $!.setRequestProperty("opentracing.ignore","true");
+ENDRULE
+
