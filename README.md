@@ -78,6 +78,12 @@ curl http://localhost:8080/greeting -d name=Fred
 Finally, start up the Hawkular APM UI and you should see the interactions between the two services on the
 Distributed Tracing page.
 
+![Distributed trace](images/SpringBootExampleDistributedTrace.png "Aggregated view of service endpoints used by the Spring Boot application")
+
+Selecting the instances button will also show the individual trace instance.
+
+![Trace instance](images/SpringBootExampleTraceInstance.png "Individual trace instance")
+
 
 ## How It Works
 
