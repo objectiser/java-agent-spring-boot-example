@@ -11,7 +11,7 @@ NOTE: This example is currently dependent upon [this PR](https://github.com/open
 The example services are based on [this example](http://github.com/obsidian-toaster/quick_rest_springboot-tomcat),
 but modified to have two spring boot services, one calling the other.
 
-The first service (Service A) is called by an external client (e.g. curl) using the `/greeting' endpoint, supplying
+The first service (Service A) is called by an external client (e.g. curl) using the `/greeting` endpoint, supplying
 an optional `name` parameter. This service then calls Service B to obtain the message template to be used. Finally
 the template, with the optional supplied `name` parameter is returned to the client.
 
@@ -50,7 +50,40 @@ The response from this command should be:
 {"id":2,"content":"Hello, Fred!"}
 ```
 
-## OpenTracing Java Agent Instrumentation
+## Running the Instrumented Example
+
+Before being able to try the OpenTracing Java Agent, it will be necessary to obtain the agent jar.
+
+It will then be necessary to [startup a Hawkular APM server](https://hawkular.gitbooks.io/hawkular-apm-user-guide/content/quickstart/) and set up the `HAWKULAR_APM_USERNAME`, `HAWKULAR_APM_PASSWORD` and `HAWKULAR_APM_URI` environment
+variables accordingly within each of the command windows that will run the services.
+
+To run the instrumented version of the services, simply add the agent to the JVM args:
+
+```
+cd servicea
+mvn spring-boot:run -Drun.jvmArguments=-javaagent:<path-to>/opentracing-agent.jar
+```
+
+```
+cd serviceb
+mvn spring-boot:run -Drun.jvmArguments=-javaagent:<path-to>/opentracing-agent.jar
+```
+
+Then re-run the client:
+
+```
+curl http://localhost:8080/greeting -d name=Fred
+```
+
+Finally, start up the Hawkular APM UI and you should see the interactions between the two services on the
+Distributed Tracing page.
+
+
+## How It Works
+
+This section describes how to take a standard Spring Boot application and prepare it for instrumentation
+using the OpenTracing Java Agent.
+
 
 ### Instrument the technologies and frameworks
 
@@ -125,34 +158,5 @@ ENDRULE
 
 NOTE: Once the OpenTracing Agent has been released, the Hawkular APM project will be updated to mark the
 `HttpURLConnection` directly with this request property.
-
-### Run the instrumented example
-
-Before being able to try the OpenTracing Java Agent, it will be necessary to obtain the agent jar.
-
-It will then be necessary to [startup a Hawkular APM server](https://hawkular.gitbooks.io/hawkular-apm-user-guide/content/quickstart/) and set up the `HAWKULAR_APM_USER`, `HAWKULAR_APM_PASSWORD` and `HAWKULAR_APM_URI` environment
-variables accordingly within each of the command windows that will run the services.
-
-To run the instrumented version of the services, simply add the agent to the JVM args:
-
-```
-cd servicea
-mvn spring-boot:run -Drun.jvmArguments=-javaagent:<path-to>/opentracing-agent.jar
-```
-
-```
-cd serviceb
-mvn spring-boot:run -Drun.jvmArguments=-javaagent:<path-to>/opentracing-agent.jar
-```
-
-Then re-run the client:
-
-```
-curl http://localhost:8080/greeting -d name=Fred
-```
-
-Finally, start up the Hawkular APM UI and you should see the interactions between the two services on the
-Distributed Tracing page.
-
 
 
