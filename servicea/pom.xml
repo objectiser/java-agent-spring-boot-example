@@ -6,20 +6,18 @@
   <version>1.0.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>rest</name>
-  <description>Obsidian :: Quickstart :: Spring Boot Tomcat - Rest - Service A</description>
-
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <java.version>1.8</java.version>
 
-    <fabric8.version>2.2.176</fabric8.version>
     <springboot-version>1.4.1.RELEASE</springboot-version>
-    <tomcat.version>8.0.36</tomcat.version>
 
-    <fabric8.maven.plugin.version>3.1.92</fabric8.maven.plugin.version>
-    <maven-surefire-plugin.version>2.18.1</maven-surefire-plugin.version>
+    <io.opentracing.contrib.java-agent.version>0.0.1-SNAPSHOT</io.opentracing.contrib.java-agent.version>
+    <io.opentracing.contrib.web-servlet-filter.version>0.0.4-SNAPSHOT</io.opentracing.contrib.web-servlet-filter.version>
+    <org.hawkular.apm.version>0.14.2.Final</org.hawkular.apm.version>
+
+    <opentracing-agent.lib>${project.build.directory}/lib</opentracing-agent.lib>
   </properties>
 
   <dependencyManagement>
@@ -28,13 +26,6 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>${springboot-version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-      <dependency>
-        <groupId>io.fabric8</groupId>
-        <artifactId>fabric8-project-bom-with-platform-deps</artifactId>
-        <version>${fabric8.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -51,82 +42,45 @@
       <artifactId>spring-boot-starter-tomcat</artifactId>
     </dependency>
 
-    <!-- Tomcat -->
+    <!-- OpenTracing Java Agent -->
     <dependency>
-      <groupId>org.apache.tomcat.embed</groupId>
-      <artifactId>tomcat-embed-core</artifactId>
-      <version>${tomcat.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.tomcat.embed</groupId>
-      <artifactId>tomcat-embed-el</artifactId>
-      <version>${tomcat.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.tomcat.embed</groupId>
-      <artifactId>tomcat-embed-websocket</artifactId>
-      <version>${tomcat.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.tomcat</groupId>
-      <artifactId>tomcat-juli</artifactId>
-      <version>${tomcat.version}</version>
+      <groupId>io.opentracing.contrib</groupId>
+      <artifactId>opentracing-agent</artifactId>
+      <scope>provided</scope>
+      <version>${io.opentracing.contrib.java-agent.version}</version>
     </dependency>
 
     <!-- OpenTracing Java Agent rule dependencies -->
     <dependency>
       <groupId>io.opentracing.contrib</groupId>
       <artifactId>opentracing-agent-rules-java-net</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
+      <version>${io.opentracing.contrib.java-agent.version}</version>
     </dependency>
     <dependency>
       <groupId>io.opentracing.contrib</groupId>
       <artifactId>opentracing-agent-rules-java-web-servlet-filter</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
+      <version>${io.opentracing.contrib.java-agent.version}</version>
     </dependency>
 
     <!-- OpenTracing Framework Integration dependencies -->
     <dependency>
       <groupId>io.opentracing.contrib</groupId>
       <artifactId>opentracing-web-servlet-filter</artifactId>
-      <version>0.0.4-SNAPSHOT</version>
+      <version>${io.opentracing.contrib.web-servlet-filter.version}</version>
     </dependency>
 
     <!-- OpenTracing compliant Tracer dependencies -->
     <dependency>
       <groupId>org.hawkular.apm</groupId>
       <artifactId>hawkular-apm-client-opentracing</artifactId>
-      <version>0.14.2.Final</version>
+      <version>${org.hawkular.apm.version}</version>
     </dependency>
     <dependency>
       <groupId>org.hawkular.apm</groupId>
       <artifactId>hawkular-apm-trace-publisher-rest-client</artifactId>
-      <version>0.14.2.Final</version>
+      <version>${org.hawkular.apm.version}</version>
     </dependency>
 
-    <!-- Testing -->
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-test</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.jboss.arquillian.junit</groupId>
-      <artifactId>arquillian-junit-container</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>io.fabric8</groupId>
-      <artifactId>fabric8-arquillian</artifactId>
-      <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>org.apache.httpcomponents</groupId>
-          <artifactId>httpclient-osgi</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
   </dependencies>
 
   <build>
@@ -152,49 +106,31 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>get-agent</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>io.opentracing.contrib</groupId>
+                  <artifactId>opentracing-agent</artifactId>
+                  <overWrite>true</overWrite>
+                  <outputDirectory>${opentracing-agent.lib}</outputDirectory>
+                  <destFileName>opentracing-agent.jar</destFileName>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
-
-  <profiles>
-    <profile>
-      <id>openshift</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>io.fabric8</groupId>
-            <artifactId>fabric8-maven-plugin</artifactId>
-            <version>${fabric8.maven.plugin.version}</version>
-            <executions>
-              <execution>
-                <goals>
-                  <goal>resource</goal>
-                  <goal>build</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <artifactId>maven-failsafe-plugin</artifactId>
-            <version>2.19.1</version>
-            <executions>
-              <execution>
-                <goals>
-                  <goal>integration-test</goal>
-                  <goal>verify</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
-
-  <scm>
-    <connection>scm:git:git://github.com/obsidian-toaster/quick_rest_springboot-tomcat.git</connection>
-    <developerConnection>scm:git:git@github.com:obsidian-toaster/quick_rest_springboot-tomcat.git</developerConnection>
-    <url>http://github.com/obsidian-toaster/quick_rest_springboot-tomcat</url>
-    <tag>HEAD</tag>
-  </scm>
 
 </project>
