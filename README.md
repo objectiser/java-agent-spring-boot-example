@@ -1,44 +1,33 @@
-# Spring Boot Example using OpenTracing Java Agent
+# Spring Boot Example using OpenTracing Java Agent with Hawkular APM
 
-NOTE: Use of this example currently requires building the agent - clone and `mvn clean install` 
-[this project](https://github.com/objectiser/java-agent). Then obtain the `opentracing-agent.jar` from the
-`opentracing-agent/target` folder.
+NOTE: Use of this example currently requires building the javaagent associated with
+[this PR](https://github.com/opentracing-contrib/java-agent/pull/1). 
 
-NOTE: This example is currently dependent upon [this PR](https://github.com/opentracing-contrib/java-web-servlet-filter/pull/11) therefore this version will need to be cloned and built locally.
+NOTE: This example is also currently dependent upon [this PR](https://github.com/opentracing-contrib/java-web-servlet-filter/pull/11) therefore this version will need to be cloned and built locally.
 
 ## The Example
 
-The example services are based on [this example](http://github.com/obsidian-toaster/quick_rest_springboot-tomcat),
-but modified to have two spring boot services, one calling the other.
+The example has two spring boot services. The first service (Service A) is called by an external client (e.g. curl) using the `/greeting` endpoint, supplying an optional `name` parameter. This service then calls Service B to obtain the message template to be used. Finally the template, with the optional supplied `name` parameter is used to return a message to the client.
 
-The first service (Service A) is called by an external client (e.g. curl) using the `/greeting` endpoint, supplying
-an optional `name` parameter. This service then calls Service B to obtain the message template to be used. Finally
-the template, with the optional supplied `name` parameter is returned to the client.
-
-To try out the example, without any instrumentation being added, build each service:
+Before being able to run the example with the OpenTracing Java Agent, it will be necessary to [startup a Hawkular APM server](https://hawkular.gitbooks.io/hawkular-apm-user-guide/content/quickstart/):
 
 ```
-cd servicea
-mvn clean install
-cd ../serviceb
-mvn clean install
-cd ..
+docker run -p 8180:8080 jboss/hawkular-apm-server-dev
 ```
 
-then run both services - you will need to start two separate command windows and then run the following
-commands in each:
+For this example, we will run the Hawkular APM server on port 8180, and the example on port 8080.
+
+Create a separate command window for each service, and run the following commands from the service's sub-folder:
 
 ```
-cd servicea
-mvn spring-boot:run
+export HAWKULAR_APM_USERNAME=jdoe
+export HAWKULAR_APM_PASSWORD=password
+export HAWKULAR_APM_URI=http://localhost:8180
+
+mvn compile spring-boot:run -Drun.jvmArguments=-javaagent:target/lib/opentracing-agent.jar
 ```
 
-```
-cd serviceb
-mvn spring-boot:run
-```
-
-Finally in a separate command window run:
+Then run the client:
 
 ```
 curl http://localhost:8080/greeting -d name=Fred
@@ -47,40 +36,14 @@ curl http://localhost:8080/greeting -d name=Fred
 The response from this command should be:
 
 ```json
-{"id":2,"content":"Hello, Fred!"}
+{"id":1,"content":"Hello, Fred!"}
 ```
 
-## Running the Instrumented Example
-
-Before being able to try the OpenTracing Java Agent, it will be necessary to obtain the agent jar.
-
-It will then be necessary to [startup a Hawkular APM server](https://hawkular.gitbooks.io/hawkular-apm-user-guide/content/quickstart/) and set up the `HAWKULAR_APM_USERNAME`, `HAWKULAR_APM_PASSWORD` and `HAWKULAR_APM_URI` environment
-variables accordingly within each of the command windows that will run the services.
-
-To run the instrumented version of the services, simply add the agent to the JVM args:
-
-```
-cd servicea
-mvn spring-boot:run -Drun.jvmArguments=-javaagent:<path-to>/opentracing-agent.jar
-```
-
-```
-cd serviceb
-mvn spring-boot:run -Drun.jvmArguments=-javaagent:<path-to>/opentracing-agent.jar
-```
-
-Then re-run the client:
-
-```
-curl http://localhost:8080/greeting -d name=Fred
-```
-
-Finally, start up the Hawkular APM UI and you should see the interactions between the two services on the
-Distributed Tracing page.
+Finally, start up the [Hawkular APM](http://localhost:8180) UI, login with the username `jdoe` and password `password` and you should see the interactions between the two services on the Distributed Tracing page.
 
 ![Distributed trace](images/SpringBootExampleDistributedTrace.png "Aggregated view of service endpoints used by the Spring Boot application")
 
-Selecting the instances button will also show the individual trace instance.
+Selecting the _Show 'n' instance(s) details_ button will also show the individual trace instance.
 
 ![Trace instance](images/SpringBootExampleTraceInstance.png "Individual trace instance")
 
@@ -90,6 +53,45 @@ Selecting the instances button will also show the individual trace instance.
 This section describes how to take a standard Spring Boot application and prepare it for instrumentation
 using the OpenTracing Java Agent.
 
+### Obtain the OpenTracing Java Agent
+
+This can be done manually, and stored in an appropriate location to be accessed when invoking the service. However for simplicity we have included retrieving the agent as part of the example build:
+
+```xml
+    <dependency>
+      <groupId>io.opentracing.contrib</groupId>
+      <artifactId>opentracing-agent</artifactId>
+      <scope>provided</scope>
+      <version>...</version>
+    </dependency>
+
+...
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>get-agent</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>io.opentracing.contrib</groupId>
+                  <artifactId>opentracing-agent</artifactId>
+                  <overWrite>true</overWrite>
+                  <outputDirectory>${opentracing-agent.lib}</outputDirectory>
+                  <destFileName>opentracing-agent.jar</destFileName>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+```
 
 ### Instrument the technologies and frameworks
 
