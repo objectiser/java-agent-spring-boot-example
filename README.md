@@ -7,7 +7,7 @@ NOTE: This example is also currently dependent upon [this PR](https://github.com
 
 ## The Example
 
-The example has two spring boot services. The first service (Service A) is called by an external client (e.g. curl) using the `/greeting` endpoint, supplying an optional `name` parameter. This service then calls Service B to obtain the message template to be used. Finally the template, with the optional supplied `name` parameter is used to return a message to the client.
+The example has two Spring Boot services. The first service (Service A) is called by an external client (e.g. curl) using the `/greeting` endpoint, supplying an optional `name` parameter. This service then calls Service B to obtain the message template to be used. Finally the template, with the optional supplied `name` parameter is used to return a message to the client.
 
 Before being able to run the example with the OpenTracing Java Agent, it will be necessary to [startup a Hawkular APM server](https://hawkular.gitbooks.io/hawkular-apm-user-guide/content/quickstart/):
 
@@ -15,7 +15,7 @@ Before being able to run the example with the OpenTracing Java Agent, it will be
 docker run -p 8180:8080 jboss/hawkular-apm-server-dev
 ```
 
-For this example, we will run the Hawkular APM server on port 8180, and the example on port 8080.
+For this example, we will run the Hawkular APM server on port 8180, and the example services on port 8080 and 8090 respectively.
 
 Create a separate command window for each service, and run the following commands from the service's sub-folder:
 
