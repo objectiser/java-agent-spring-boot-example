@@ -1,9 +1,7 @@
 # Spring Boot Example using OpenTracing Java Agent with Hawkular APM
 
-NOTE: Use of this example currently requires building the javaagent associated with
-[this PR](https://github.com/opentracing-contrib/java-agent/pull/1). 
-
-NOTE: This example is also currently dependent upon [this PR](https://github.com/opentracing-contrib/java-web-servlet-filter/pull/11) therefore this version will need to be cloned and built locally.
+This example demonstrates how to instrument a Spring Boot application in a non-intrusive way, using the
+OpenTracing Java Agent with Hawkular APM as the backend tracing system.
 
 ## The Example
 
