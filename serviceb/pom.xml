@@ -13,9 +13,9 @@
 
     <springboot-version>1.4.1.RELEASE</springboot-version>
 
-    <io.opentracing.contrib.java-agent.version>0.0.1-SNAPSHOT</io.opentracing.contrib.java-agent.version>
-    <io.opentracing.contrib.web-servlet-filter.version>0.0.4-SNAPSHOT</io.opentracing.contrib.web-servlet-filter.version>
-    <org.hawkular.apm.version>0.14.2.Final</org.hawkular.apm.version>
+    <io.opentracing.contrib.java-agent.version>0.0.10</io.opentracing.contrib.java-agent.version>
+    <io.opentracing.contrib.web-servlet-filter.version>0.0.4</io.opentracing.contrib.web-servlet-filter.version>
+    <org.hawkular.apm.version>0.14.3.Final</org.hawkular.apm.version>
 
     <opentracing-agent.lib>${project.build.directory}/lib</opentracing-agent.lib>
   </properties>
