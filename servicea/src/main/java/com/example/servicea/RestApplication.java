@@ -16,13 +16,19 @@
  */
 package com.example.servicea;
 
+import org.hawkular.apm.client.opentracing.APMTracer;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import io.opentracing.contrib.global.GlobalTracer;
 
 @SpringBootApplication
 public class RestApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(RestApplication.class, args);
-	}
+    public static void main(String[] args) {
+        // TODO: Currently need to create Tracer directly under need 'tracer resolver' mechanism is available
+        APMTracer tracer=new APMTracer();
+        GlobalTracer.register(tracer);
+        SpringApplication.run(RestApplication.class, args);
+    }
 }

@@ -11,15 +11,22 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <java.version>1.8</java.version>
 
-    <springboot-version>1.4.1.RELEASE</springboot-version>
+    <springboot-version>1.5.2.RELEASE</springboot-version>
 
-    <io.opentracing.contrib.java-agent.version>0.0.10</io.opentracing.contrib.java-agent.version>
+    <io.opentracing.contrib.java-agent.version>0.0.11</io.opentracing.contrib.java-agent.version>
     <io.opentracing.contrib.web-servlet-filter.version>0.0.4</io.opentracing.contrib.web-servlet-filter.version>
-    <org.hawkular.apm.version>0.14.3.Final</org.hawkular.apm.version>
+    <org.hawkular.apm.version>0.14.4.Final</org.hawkular.apm.version>
 
     <opentracing-agent.lib>${project.build.directory}/lib</opentracing-agent.lib>
   </properties>
 
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>1.5.2.RELEASE</version>
+    <relativePath/>
+  </parent>
+    
   <dependencyManagement>
     <dependencies>
       <dependency>
