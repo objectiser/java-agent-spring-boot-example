@@ -22,8 +22,18 @@ export HAWKULAR_APM_USERNAME=jdoe
 export HAWKULAR_APM_PASSWORD=password
 export HAWKULAR_APM_URI=http://localhost:8180
 
-mvn compile spring-boot:run -Drun.jvmArguments=-javaagent:target/lib/opentracing-agent.jar
+mvn clean install
+
+mvn spring-boot:run -Drun.jvmArguments=-javaagent:target/lib/opentracing-agent.jar
+
+OR
+
+java -javaagent:target/lib/opentracing-agent.jar -jar target/servicea-1.0.0-SNAPSHOT.jar
+
+(change 'servicea' to 'serviceb' as appropriate)
 ```
+
+The second way of invoking the service uses the uber jar created during the maven build.
 
 Then run the client:
 
